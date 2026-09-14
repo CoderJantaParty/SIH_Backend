@@ -4,7 +4,7 @@ import com.sih.landacquisitionsystem.dto.AcquisitionStageDTO;
 import com.sih.landacquisitionsystem.model.AcquisitionStage;
 import com.sih.landacquisitionsystem.model.Project;
 import com.sih.landacquisitionsystem.model.User;
-import com.sih.landacquisitionsystem.model.AcquisitionStage.Stage;
+import com.sih.landacquisitionsystem.model.Project.Status;
 import com.sih.landacquisitionsystem.repository.AcquisitionStageRepository;
 import com.sih.landacquisitionsystem.repository.ProjectRepository;
 import com.sih.landacquisitionsystem.repository.UserRepository;
@@ -100,14 +100,19 @@ public class AcquisitionStageService {
             throw new RuntimeException("No acquisition stage found for project");
         }
 
-        // Define the sequence of stages
-        Stage[] stageSequence = {
-                Stage.PROPOSED,
-                Stage.NOTIFIED,
-                Stage.AWARDED,
-                Stage.COMPENSATION_PAID,
-                Stage.POSSESSION_TAKEN,
-                Stage.RR_COMPLETE
+        // Define the sequence of stages based on Project.Status
+        Status[] stageSequence = {
+                Status.DRAFT,
+                Status.SUBMITTED,
+                Status.UNDER_SCRUTINY,
+                Status.APPROVED,
+                Status.LAND_IDENTIFICATION,
+                Status.NOTIFICATION,
+                Status.AWARD,
+                Status.COMPENSATION,
+                Status.POSSESSION,
+                Status.R_AND_R,
+                Status.COMPLETED
         };
 
         // Find current stage index
@@ -129,7 +134,7 @@ public class AcquisitionStageService {
         }
 
         // Get next stage
-        Stage nextStage = stageSequence[currentIndex + 1];
+        Status nextStage = stageSequence[currentIndex + 1];
 
         // Update the stage
         currentStage.setStage(nextStage);

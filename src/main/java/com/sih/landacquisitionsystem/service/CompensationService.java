@@ -2,9 +2,13 @@ package com.sih.landacquisitionsystem.service;
 
 import com.sih.landacquisitionsystem.dto.CompensationDTO;
 import com.sih.landacquisitionsystem.model.Compensation;
+import com.sih.landacquisitionsystem.model.LandOwner;
 import com.sih.landacquisitionsystem.model.LandParcel;
+import com.sih.landacquisitionsystem.model.Project;
 import com.sih.landacquisitionsystem.repository.CompensationRepository;
+import com.sih.landacquisitionsystem.repository.LandOwnerRepository;
 import com.sih.landacquisitionsystem.repository.LandParcelRepository;
+import com.sih.landacquisitionsystem.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,18 +25,29 @@ public class CompensationService {
     @Autowired
     private LandParcelRepository landParcelRepository;
 
+    @Autowired
+    private ProjectRepository projectRepository;
+
+    @Autowired
+    private LandOwnerRepository landOwnerRepository;
+
     public CompensationDTO createCompensation(CompensationDTO compensationDTO) {
         LandParcel parcel = landParcelRepository.findById(compensationDTO.getParcelId())
                 .orElseThrow(() -> new RuntimeException("Land parcel not found"));
+        Project project = projectRepository.findById(compensationDTO.getProjectId())
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+        LandOwner beneficiary = landOwnerRepository.findById(compensationDTO.getBeneficiaryId())
+                .orElseThrow(() -> new RuntimeException("Beneficiary not found"));
 
         Compensation compensation = new Compensation();
         compensation.setParcel(parcel);
+        compensation.setProject(project);
+        compensation.setBeneficiary(beneficiary);
         compensation.setAssessedAmount(compensationDTO.getAssessedAmount());
+        compensation.setApprovedAmount(compensationDTO.getApprovedAmount());
         compensation.setPaidAmount(compensationDTO.getPaidAmount());
-        // For paidDate, we'll convert from String to LocalDate if needed
-        if (compensationDTO.getPaidDate() != null && !compensationDTO.getPaidDate().isEmpty()) {
-            compensation.setPaidDate(LocalDate.parse(compensationDTO.getPaidDate()));
-        }
+        compensation.setPaidDate(compensationDTO.getPaidDate());
+        compensation.setTransactionReference(compensationDTO.getTransactionReference());
         compensation.setStatus(compensationDTO.getStatus());
 
         Compensation savedCompensation = compensationRepository.save(compensation);
@@ -64,14 +79,19 @@ public class CompensationService {
 
         LandParcel parcel = landParcelRepository.findById(compensationDTO.getParcelId())
                 .orElseThrow(() -> new RuntimeException("Land parcel not found"));
+        Project project = projectRepository.findById(compensationDTO.getProjectId())
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+        LandOwner beneficiary = landOwnerRepository.findById(compensationDTO.getBeneficiaryId())
+                .orElseThrow(() -> new RuntimeException("Beneficiary not found"));
 
         compensation.setParcel(parcel);
+        compensation.setProject(project);
+        compensation.setBeneficiary(beneficiary);
         compensation.setAssessedAmount(compensationDTO.getAssessedAmount());
+        compensation.setApprovedAmount(compensationDTO.getApprovedAmount());
         compensation.setPaidAmount(compensationDTO.getPaidAmount());
-        // For paidDate, we'll convert from String to LocalDate if needed
-        if (compensationDTO.getPaidDate() != null && !compensationDTO.getPaidDate().isEmpty()) {
-            compensation.setPaidDate(LocalDate.parse(compensationDTO.getPaidDate()));
-        }
+        compensation.setPaidDate(compensationDTO.getPaidDate());
+        compensation.setTransactionReference(compensationDTO.getTransactionReference());
         compensation.setStatus(compensationDTO.getStatus());
 
         Compensation updatedCompensation = compensationRepository.save(compensation);
@@ -86,13 +106,17 @@ public class CompensationService {
     }
 
     private CompensationDTO convertToDTO(Compensation compensation) {
-        return new CompensationDTO(
-                compensation.getId(),
-                compensation.getParcel().getId(),
-                compensation.getAssessedAmount(),
-                compensation.getPaidAmount(),
-                compensation.getPaidDate() != null ? compensation.getPaidDate().toString() : null,
-                compensation.getStatus()
-        );
+        return CompensationDTO.builder()
+                .id(compensation.getId())
+                .parcelId(compensation.getParcel().getId())
+                .projectId(compensation.getProject().getId())
+                .beneficiaryId(compensation.getBeneficiary().getId())
+                .assessedAmount(compensation.getAssessedAmount())
+                .approvedAmount(compensation.getApprovedAmount())
+                .paidAmount(compensation.getPaidAmount())
+                .paidDate(compensation.getPaidDate())
+                .transactionReference(compensation.getTransactionReference())
+                .status(compensation.getStatus())
+                .build();
     }
 }

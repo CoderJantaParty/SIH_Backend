@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+import com.sih.landacquisitionsystem.model.Project.Status;
+
 @Entity
 @Table(name = "acquisition_stages")
 @Getter
@@ -24,7 +26,7 @@ public class AcquisitionStage {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Stage stage;
+    private Project.Status stage;
 
     @ManyToOne
     @JoinColumn(name = "updated_by", nullable = false)
@@ -34,13 +36,4 @@ public class AcquisitionStage {
     private LocalDateTime updatedAt;
 
     private String remarks;
-
-    public enum Stage {
-        PROPOSED,
-        NOTIFIED,
-        AWARDED,
-        COMPENSATION_PAID,
-        POSSESSION_TAKEN,
-        RR_COMPLETE
-    }
 }

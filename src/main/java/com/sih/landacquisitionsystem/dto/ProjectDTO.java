@@ -2,6 +2,7 @@ package com.sih.landacquisitionsystem.dto;
 
 import lombok.*;
 import com.sih.landacquisitionsystem.model.Project.Status;
+import com.sih.landacquisitionsystem.model.ProjectType;
 
 @Getter
 @Setter
@@ -11,11 +12,22 @@ import com.sih.landacquisitionsystem.model.Project.Status;
 public class ProjectDTO {
 
     private Long id;
-    private String title;
+    private String projectCode;
+    private String name;
+    private String description;
+    private ProjectType projectType;
     private String ministry;
+    private String implementingAgency;
+    private String acquiringAuthority;
     private String state;
     private String district;
+    private String village;
+    private Double proposedArea;
+    private Double acquiredArea;
+    private LocalDate startDate;
+    private LocalDate expectedCompletionDate;
     private Status status;
     private Long createdBy; // User ID
-    // createdAt is not typically needed in DTO for creation, but can be included if needed
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

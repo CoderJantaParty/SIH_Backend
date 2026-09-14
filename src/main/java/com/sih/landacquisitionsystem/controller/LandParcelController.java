@@ -17,7 +17,7 @@ public class LandParcelController {
     private LandParcelService landParcelService;
 
     @PostMapping
-    @PreAuthorize("hasRole('MINISTRY_ADMIN') or hasRole('STATE_OFFICER') or hasRole('DISTRICT_OFFICER')")
+    @PreAuthorize("hasRole('CENTRAL_MINISTRY') or hasRole('STATE_AUTHORITY') or hasRole('DISTRICT_AUTHORITY')")
     public ResponseEntity<LandParcelDTO> createParcel(@RequestBody LandParcelDTO landParcelDTO) {
         LandParcelDTO createdParcel = landParcelService.createParcel(landParcelDTO);
         return ResponseEntity.ok(createdParcel);
@@ -45,14 +45,14 @@ public class LandParcelController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('MINISTRY_ADMIN') or hasRole('STATE_OFFICER') or hasRole('DISTRICT_OFFICER')")
+    @PreAuthorize("hasRole('CENTRAL_MINISTRY') or hasRole('STATE_AUTHORITY') or hasRole('DISTRICT_AUTHORITY')")
     public ResponseEntity<LandParcelDTO> updateParcel(@PathVariable Long id, @RequestBody LandParcelDTO landParcelDTO) {
         LandParcelDTO updatedParcel = landParcelService.updateParcel(id, landParcelDTO);
         return ResponseEntity.ok(updatedParcel);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('MINISTRY_ADMIN') or hasRole('STATE_OFFICER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteParcel(@PathVariable Long id) {
         landParcelService.deleteParcel(id);
         return ResponseEntity.noContent().build();

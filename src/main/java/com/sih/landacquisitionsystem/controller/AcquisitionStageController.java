@@ -24,7 +24,7 @@ public class AcquisitionStageController {
     }
 
     @PutMapping("/{projectId}/stage")
-    @PreAuthorize("hasRole('MINISTRY_ADMIN') or hasRole('STATE_OFFICER') or hasRole('DISTRICT_OFFICER') or hasRole('PROJECT_AGENCY')")
+    @PreAuthorize("hasRole('CENTRAL_MINISTRY') or hasRole('STATE_AUTHORITY') or hasRole('DISTRICT_AUTHORITY') or hasRole('PROJECT_AGENCY')")
     public ResponseEntity<AcquisitionStageDTO> updateStage(@PathVariable Long projectId, @RequestBody AcquisitionStageDTO stageDTO) {
         stageDTO.setProjectId(projectId);
         AcquisitionStageDTO updatedStage = acquisitionStageService.updateStage(stageDTO.getId(), stageDTO);
@@ -32,7 +32,7 @@ public class AcquisitionStageController {
     }
 
     @PutMapping("/{projectId}/advance-stage")
-    @PreAuthorize("hasRole('MINISTRY_ADMIN') or hasRole('STATE_OFFICER') or hasRole('DISTRICT_OFFICER') or hasRole('PROJECT_AGENCY')")
+    @PreAuthorize("hasRole('CENTRAL_MINISTRY') or hasRole('STATE_AUTHORITY') or hasRole('DISTRICT_AUTHORITY') or hasRole('PROJECT_AGENCY')")
     public ResponseEntity<AcquisitionStageDTO> advanceStage(
             @PathVariable Long projectId,
             @RequestParam Long updatedBy,

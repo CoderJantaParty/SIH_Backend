@@ -17,7 +17,7 @@ public class CompensationController {
     private CompensationService compensationService;
 
     @PostMapping
-    @PreAuthorize("hasRole('MINISTRY_ADMIN') or hasRole('STATE_OFFICER') or hasRole('DISTRICT_OFFICER')")
+    @PreAuthorize("hasRole('CENTRAL_MINISTRY') or hasRole('STATE_AUTHORITY') or hasRole('DISTRICT_AUTHORITY')")
     public ResponseEntity<CompensationDTO> createCompensation(@RequestBody CompensationDTO compensationDTO) {
         CompensationDTO createdCompensation = compensationService.createCompensation(compensationDTO);
         return ResponseEntity.ok(createdCompensation);
@@ -45,14 +45,14 @@ public class CompensationController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('MINISTRY_ADMIN') or hasRole('STATE_OFFICER') or hasRole('DISTRICT_OFFICER')")
+    @PreAuthorize("hasRole('CENTRAL_MINISTRY') or hasRole('STATE_AUTHORITY') or hasRole('DISTRICT_AUTHORITY')")
     public ResponseEntity<CompensationDTO> updateCompensation(@PathVariable Long id, @RequestBody CompensationDTO compensationDTO) {
         CompensationDTO updatedCompensation = compensationService.updateCompensation(id, compensationDTO);
         return ResponseEntity.ok(updatedCompensation);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('MINISTRY_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteCompensation(@PathVariable Long id) {
         compensationService.deleteCompensation(id);
         return ResponseEntity.noContent().build();

@@ -26,13 +26,24 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Project project = new Project();
-        project.setTitle(projectDTO.getTitle());
+        project.setProjectCode(projectDTO.getProjectCode());
+        project.setName(projectDTO.getName());
+        project.setDescription(projectDTO.getDescription());
+        project.setProjectType(projectDTO.getProjectType());
         project.setMinistry(projectDTO.getMinistry());
+        project.setImplementingAgency(projectDTO.getImplementingAgency());
+        project.setAcquiringAuthority(projectDTO.getAcquiringAuthority());
         project.setState(projectDTO.getState());
         project.setDistrict(projectDTO.getDistrict());
+        project.setVillage(projectDTO.getVillage());
+        project.setProposedArea(projectDTO.getProposedArea());
+        project.setAcquiredArea(projectDTO.getAcquiredArea());
+        project.setStartDate(projectDTO.getStartDate());
+        project.setExpectedCompletionDate(projectDTO.getExpectedCompletionDate());
         project.setStatus(projectDTO.getStatus());
         project.setCreatedBy(createdBy);
         project.setCreatedAt(LocalDateTime.now());
+        // updatedAt remains null on creation
 
         Project savedProject = projectRepository.save(project);
         return convertToDTO(savedProject);
@@ -72,11 +83,23 @@ public class ProjectService {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
-        project.setTitle(projectDTO.getTitle());
+        project.setProjectCode(projectDTO.getProjectCode());
+        project.setName(projectDTO.getName());
+        project.setDescription(projectDTO.getDescription());
+        project.setProjectType(projectDTO.getProjectType());
         project.setMinistry(projectDTO.getMinistry());
+        project.setImplementingAgency(projectDTO.getImplementingAgency());
+        project.setAcquiringAuthority(projectDTO.getAcquiringAuthority());
         project.setState(projectDTO.getState());
         project.setDistrict(projectDTO.getDistrict());
+        project.setVillage(projectDTO.getVillage());
+        project.setProposedArea(projectDTO.getProposedArea());
+        project.setAcquiredArea(projectDTO.getAcquiredArea());
+        project.setStartDate(projectDTO.getStartDate());
+        project.setExpectedCompletionDate(projectDTO.getExpectedCompletionDate());
         project.setStatus(projectDTO.getStatus());
+        // updatedBy? We don't have updatedBy in the model, but we can add if needed. For now, we'll just update the updatedAt timestamp.
+        project.setUpdatedAt(LocalDateTime.now());
 
         Project updatedProject = projectRepository.save(project);
         return convertToDTO(updatedProject);
@@ -92,12 +115,24 @@ public class ProjectService {
     private ProjectDTO convertToDTO(Project project) {
         return ProjectDTO.builder()
                 .id(project.getId())
-                .title(project.getTitle())
+                .projectCode(project.getProjectCode())
+                .name(project.getName())
+                .description(project.getDescription())
+                .projectType(project.getProjectType())
                 .ministry(project.getMinistry())
+                .implementingAgency(project.getImplementingAgency())
+                .acquiringAuthority(project.getAcquiringAuthority())
                 .state(project.getState())
                 .district(project.getDistrict())
+                .village(project.getVillage())
+                .proposedArea(project.getProposedArea())
+                .acquiredArea(project.getAcquiredArea())
+                .startDate(project.getStartDate())
+                .expectedCompletionDate(project.getExpectedCompletionDate())
                 .status(project.getStatus())
                 .createdBy(project.getCreatedBy().getId())
+                .createdAt(project.getCreatedAt())
+                .updatedAt(project.getUpdatedAt())
                 .build();
     }
 }

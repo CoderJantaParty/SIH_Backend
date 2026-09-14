@@ -3,20 +3,23 @@ package com.sih.landacquisitionsystem.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "compensations")
+@Table(name = "affected_families")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Compensation {
+public class AffectedFamily {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
+    private String familyIdentifier;
 
     @ManyToOne
     @JoinColumn(name = "parcel_id", nullable = false)
@@ -26,32 +29,20 @@ public class Compensation {
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
-    @ManyToOne
-    @JoinColumn(name = "beneficiary_id", nullable = false)
-    private LandOwner beneficiary;
+    @Column(nullable = false)
+    private Integer numberOfMembers;
 
     @Column(nullable = false)
-    private Double assessedAmount;
+    private Boolean displacedStatus;
 
     @Column(nullable = false)
-    private Double approvedAmount;
-
-    @Column(nullable = false)
-    private Double paidAmount;
-
-    private LocalDate paidDate;
-
-    private String transactionReference;
+    private Boolean eligibility;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Status status;
+    private RRStatus rrStatus;
 
-    public enum Status {
-        ASSESSED,
-        APPROVED,
-        PARTIALLY_PAID,
-        PAID,
-        DISPUTED
-    }
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
 }

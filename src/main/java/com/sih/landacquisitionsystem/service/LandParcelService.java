@@ -2,7 +2,9 @@ package com.sih.landacquisitionsystem.service;
 
 import com.sih.landacquisitionsystem.dto.LandParcelDTO;
 import com.sih.landacquisitionsystem.model.LandParcel;
+import com.sih.landacquisitionsystem.model.LandOwner;
 import com.sih.landacquisitionsystem.model.Project;
+import com.sih.landacquisitionsystem.repository.LandOwnerRepository;
 import com.sih.landacquisitionsystem.repository.LandParcelRepository;
 import com.sih.landacquisitionsystem.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +22,30 @@ public class LandParcelService {
     @Autowired
     private ProjectRepository projectRepository;
 
+    @Autowired
+    private LandOwnerRepository landOwnerRepository;
+
     public LandParcelDTO createParcel(LandParcelDTO landParcelDTO) {
         Project project = projectRepository.findById(landParcelDTO.getProjectId())
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
         LandParcel landParcel = new LandParcel();
         landParcel.setProject(project);
+        landParcel.setParcelNumber(landParcelDTO.getParcelNumber());
         landParcel.setSurveyNumber(landParcelDTO.getSurveyNumber());
+        landParcel.setState(landParcelDTO.getState());
+        landParcel.setDistrict(landParcelDTO.getDistrict());
+        landParcel.setVillage(landParcelDTO.getVillage());
+        landParcel.setLandType(landParcelDTO.getLandType());
         landParcel.setArea(landParcelDTO.getArea());
         landParcel.setLatitude(landParcelDTO.getLatitude());
         landParcel.setLongitude(landParcelDTO.getLongitude());
+        // Set landOwner if landOwnerId is provided
+        if (landParcelDTO.getLandOwnerId() != null) {
+            LandOwner landOwner = landOwnerRepository.findById(landParcelDTO.getLandOwnerId())
+                    .orElseThrow(() -> new RuntimeException("Land owner not found"));
+            landParcel.setLandOwner(landOwner);
+        }
         landParcel.setStatus(landParcelDTO.getStatus());
 
         LandParcel savedParcel = landParcelRepository.save(landParcel);
@@ -63,10 +79,23 @@ public class LandParcelService {
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
         landParcel.setProject(project);
+        landParcel.setParcelNumber(landParcelDTO.getParcelNumber());
         landParcel.setSurveyNumber(landParcelDTO.getSurveyNumber());
+        landParcel.setState(landParcelDTO.getState());
+        landParcel.setDistrict(landParcelDTO.getDistrict());
+        landParcel.setVillage(landParcelDTO.getVillage());
+        landParcel.setLandType(landParcelDTO.getLandType());
         landParcel.setArea(landParcelDTO.getArea());
         landParcel.setLatitude(landParcelDTO.getLatitude());
         landParcel.setLongitude(landParcelDTO.getLongitude());
+        // Set landOwner if landOwnerId is provided
+        if (landParcelDTO.getLandOwnerId() != null) {
+            LandOwner landOwner = landOwnerRepository.findById(landParcelDTO.getLandOwnerId())
+                    .orElseThrow(() -> new RuntimeException("Land owner not found"));
+            landParcel.setLandOwner(landOwner);
+        } else {
+            landParcel.setLandOwner(null);
+        }
         landParcel.setStatus(landParcelDTO.getStatus());
 
         LandParcel updatedParcel = landParcelRepository.save(landParcel);
@@ -83,11 +112,17 @@ public class LandParcelService {
     private LandParcelDTO convertToDTO(LandParcel landParcel) {
         return LandParcelDTO.builder()
                 .id(landParcel.getId())
-                .projectId(landParcel.getProject().getId())
+                .parcelNumber(landParcel.getParcelNumber())
                 .surveyNumber(landParcel.getSurveyNumber())
+                .projectId(landParcel.getProject().getId())
+                .state(landParcel.getState())
+                .district(landParcel.getDistrict())
+                .village(landParcel.getVillage())
+                .landType(landParcel.getLandType())
                 .area(landParcel.getArea())
                 .latitude(landParcel.getLatitude())
                 .longitude(landParcel.getLongitude())
+                .landOwnerId(landParcel.getLandOwner() != null ? landParcel.getLandOwner().getId() : null)
                 .status(landParcel.getStatus())
                 .build();
     }

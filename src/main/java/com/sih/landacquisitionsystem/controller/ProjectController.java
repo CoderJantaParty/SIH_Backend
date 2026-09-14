@@ -17,7 +17,7 @@ public class ProjectController {
     private ProjectService projectService;
 
     @PostMapping
-    @PreAuthorize("hasRole('MINISTRY_ADMIN') or hasRole('STATE_OFFICER')")
+    @PreAuthorize("hasRole('CENTRAL_MINISTRY') or hasRole('STATE_AUTHORITY')")
     public ResponseEntity<ProjectDTO> createProject(@RequestBody ProjectDTO projectDTO, @RequestParam Long createdBy) {
         ProjectDTO createdProject = projectService.createProject(projectDTO, createdBy);
         return ResponseEntity.ok(createdProject);
@@ -59,14 +59,14 @@ public class ProjectController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('MINISTRY_ADMIN') or hasRole('STATE_OFFICER')")
+    @PreAuthorize("hasRole('CENTRAL_MINISTRY') or hasRole('STATE_AUTHORITY')")
     public ResponseEntity<ProjectDTO> updateProject(@PathVariable Long id, @RequestBody ProjectDTO projectDTO) {
         ProjectDTO updatedProject = projectService.updateProject(id, projectDTO);
         return ResponseEntity.ok(updatedProject);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('MINISTRY_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
         return ResponseEntity.noContent().build();

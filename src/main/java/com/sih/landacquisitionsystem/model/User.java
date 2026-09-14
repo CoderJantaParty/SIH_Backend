@@ -30,9 +30,13 @@ public class User {
     private Role role;
 
     public enum Role {
-        MINISTRY_ADMIN,
-        STATE_OFFICER,
-        DISTRICT_OFFICER,
-        PROJECT_AGENCY
+        ADMIN,
+        CENTRAL_MINISTRY,
+        STATE_AUTHORITY,
+        DISTRICT_AUTHORITY,
+        LAND_ACQUIRING_OFFICER,
+        PROJECT_AGENCY,
+        FIELD_OFFICER,
+        VIEWER
     }
 }
