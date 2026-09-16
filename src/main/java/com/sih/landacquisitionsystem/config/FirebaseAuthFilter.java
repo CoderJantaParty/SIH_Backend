@@ -1,15 +1,11 @@
 package com.sih.landacquisitionsystem.config;
 
-import com.sih.landacquisitionsystem.repository.UserRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseToken;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,16 +13,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
+/**
+ * Filter to verify Firebase ID tokens and set authentication in the SecurityContext.
+ */
 @Component
-public class JwtAuthFilter extends OncePerRequestFilter {
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Value("${app.jwt-secret}")
-    private String jwtSecret;
+public class FirebaseAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -36,26 +30,24 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (token != null && !token.isEmpty()) {
             try {
-                // Parse the token
-                Claims claims = Jwts.parserBuilder()
-                        .setSigningKey(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
-                        .build()
-                        .parseClaimsJws(token)
-                        .getBody();
+                // Verify the Firebase ID token
+                FirebaseToken firebaseToken = FirebaseAuth.getInstance().verifyIdToken(token);
+                String uid = firebaseToken.getUid();
+                String email = firebaseToken.getEmail();
 
-                String email = claims.getSubject();
-                String role = claims.get("role", String.class);
+                // You can extract other claims if needed, e.g., role
+                // String role = firebaseToken.getClaim("role");
 
-                // Load user from database (optional, but we can check if user exists)
-                // For now, we'll just set the authentication if the token is valid and the user exists.
-                // We can also load the user details and set the authorities.
-
-                // We'll create a simple authority from the role.
-                List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+                // For now, we'll set the UID as the principal and assign a default role.
+                // In a real application, you might fetch roles from Firebase custom claims or a database.
+                List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
 
                 // Create the authentication object
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        email, null, authorities);
+                        uid, null, authorities);
+
+                // Optionally, set additional details like email
+                authentication.setDetails(email);
 
                 // Set the authentication in the security context
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -64,6 +56,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 // If token is invalid, we should not set authentication and let the request fail
                 // We can also clear the security context to be safe
                 SecurityContextHolder.clearContext();
+                // Optionally, log the error
+                // logger.error("Firebase token verification failed", e);
             }
         }
 
