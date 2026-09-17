@@ -1,5 +1,6 @@
 package com.sih.landacquisitionsystem.config;
 
+import com.sih.landacquisitionsystem.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -8,12 +9,15 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
-/**
- * Spring Security configuration for Firebase authentication.
- */
 @Configuration
 @EnableMethodSecurity // Enables @PreAuthorize, @PostAuthorize, etc.
 public class SecurityConfig {
+
+    private final UserRepository userRepository;
+
+    public SecurityConfig(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -34,6 +38,6 @@ public class SecurityConfig {
 
     @Bean
     public FirebaseAuthFilter firebaseAuthFilter() {
-        return new FirebaseAuthFilter();
+        return new FirebaseAuthFilter(userRepository);
     }
 }

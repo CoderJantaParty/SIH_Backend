@@ -2,10 +2,13 @@ package com.sih.landacquisitionsystem.config;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
+import com.sih.landacquisitionsystem.model.User;
+import com.sih.landacquisitionsystem.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,12 +18,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
-/**
- * Filter to verify Firebase ID tokens and set authentication in the SecurityContext.
- */
 @Component
+@RequiredArgsConstructor
 public class FirebaseAuthFilter extends OncePerRequestFilter {
+
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -35,12 +39,33 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
                 String uid = firebaseToken.getUid();
                 String email = firebaseToken.getEmail();
 
-                // You can extract other claims if needed, e.g., role
-                // String role = firebaseToken.getClaim("role");
+                // Look up user in our database by firebaseUid
+                Optional<User> userOptional = userRepository.findByFirebaseUid(uid);
+                User user = userOptional.orElseGet(() -> {
+                    // If user not found, we can create a new user entry with default role?
+                    // For security, we might want to reject the request. However, for MVP we'll create a pending user.
+                    // We'll create a user with minimal info and role ROLE_USER.
+                    User newUser = User.builder()
+                            .firebaseUid(uid)
+                            .email(email != null ? email : "")
+                            .name(uid) // Use UID as name placeholder
+                            .role("ROLE_USER")
+                            .enabled(true)
+                            .build();
+                    // We cannot save the user here because we are in a filter and might not have transaction support.
+                    // Instead, we'll return a user object that is not saved, but we need to persist it later.
+                    // For simplicity, we'll just use a temporary user with role ROLE_USER and not persist.
+                    // In a real app, we would have a registration flow.
+                    return newUser;
+                });
 
-                // For now, we'll set the UID as the principal and assign a default role.
-                // In a real application, you might fetch roles from Firebase custom claims or a database.
-                List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+                // Determine authorities based on user role
+                String role = user.getRole();
+                // Ensure role starts with ROLE_ for Spring Security
+                if (!role.startsWith("ROLE_")) {
+                    role = "ROLE_" + role;
+                }
+                List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
 
                 // Create the authentication object
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
